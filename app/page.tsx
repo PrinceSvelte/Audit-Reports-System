@@ -317,9 +317,9 @@ export default function AuditReportSystem() {
       // Footer
       pdf.setFontSize(10)
       pdf.setTextColor(colors.medium.r, colors.medium.g, colors.medium.b)
-      // pdf.text("CONFIDENTIAL", 105, 250, { align: "center" })
+      pdf.text("CONFIDENTIAL", 105, 250, { align: "center" })
       pdf.setFontSize(9)
-      // pdf.text(`Generated on ${new Date().toLocaleDateString()}`, 105, 260, { align: "center" })
+      pdf.text(`Generated on ${new Date().toLocaleDateString()}`, 105, 260, { align: "center" })
 
       pdf.addPage()
       yPosition = 20
@@ -330,22 +330,22 @@ export default function AuditReportSystem() {
       yPosition = addGradientHeader("TABLE OF CONTENTS")
 
       const tocItems = [
-        { title: "1. Document Preparation"},
-        { title: "2. Change History" },
-        { title: "3. Distribution List",},
-        { title: "4. Introduction",  },
-        { title: "5. Engagement Scope", },
-        { title: "6. Auditing Team" },
-        { title: "7. Audit Activities" },
-        { title: "8. Audit Methodology" },
-        { title: "9. Pre-engagement",  },
-        { title: "10. Engagement",  },
-        { title: "11. Post-Engagement" },
-        { title: "12. Risk Assessment Methodology" },
-        { title: "13. Tools & Software" },
-        { title: "14. Executive Summary" },
-        { title: "15. Vulnerabilities Summary" },
-        { title: "16. Detailed Observations"},
+        { title: "1. Document Preparation", page: 3 },
+        { title: "2. Change History", page: 4 },
+        { title: "3. Distribution List", page: 5 },
+        { title: "4. Introduction", page: 6 },
+        { title: "5. Engagement Scope", page: 7 },
+        { title: "6. Auditing Team", page: 8 },
+        { title: "7. Audit Activities", page: 9 },
+        { title: "8. Audit Methodology", page: 10 },
+        { title: "9. Pre-engagement", page: 11 },
+        { title: "10. Engagement", page: 12 },
+        { title: "11. Post-Engagement", page: 13 },
+        { title: "12. Risk Assessment Methodology", page: 14 },
+        { title: "13. Tools & Software", page: 15 },
+        { title: "14. Executive Summary", page: 16 },
+        { title: "15. Vulnerabilities Summary", page: 17 },
+        { title: "16. Detailed Observations", page: 18 },
       ]
 
       pdf.setTextColor(colors.dark.r, colors.dark.g, colors.dark.b)
@@ -1208,9 +1208,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("documentControl")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1240,9 +1240,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("tableOfContents")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1264,9 +1264,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("introduction")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1294,9 +1294,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("engagementScope")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1318,9 +1318,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("auditingTeam")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1342,9 +1342,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("auditActivities")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white  w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1366,9 +1366,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("auditMethodology")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1397,9 +1397,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("preEngagement")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1424,12 +1424,12 @@ This report has been produced based on the output of the Security Assessment. Al
                 onTitleChange={(title) => updateEditableHeader("engagement", title)}
               />
               <Button
-                variant="destructive" 
+                variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("engagement")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1457,9 +1457,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("postEngagement")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1487,9 +1487,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => deleteEditableContent("riskMethodology")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Section
               </Button>
             </CardHeader>
@@ -1517,9 +1517,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("toolsSoftware")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1541,9 +1541,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("vulnerability")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1565,9 +1565,9 @@ This report has been produced based on the output of the Security Assessment. Al
                 variant="destructive"
                 size="sm"
                 onClick={() => toggleTable("detailedObservation")}
-                className="text-white flex items-center gap-2"
+                className="flex items-center gap-2 text-white"
               >
-                <Trash2 className="text-white w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 Delete Table
               </Button>
             </CardHeader>
@@ -1578,7 +1578,7 @@ This report has been produced based on the output of the Security Assessment. Al
         )}
 
         {/* Add Table Button */}
-        {/* <Card className="border-dashed border-2 border-gray-300">
+        <Card className="border-dashed border-2 border-gray-300">
           <CardContent className="flex items-center justify-center p-8">
             <div className="text-center">
               <Plus className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -1601,7 +1601,7 @@ This report has been produced based on the output of the Security Assessment. Al
               </div>
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Confirmation Dialogs */}
         <ConfirmationDialog

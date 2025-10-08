@@ -110,7 +110,7 @@ export default function AuditReportSystem() {
       return false
     }
 
-    // Custom table drawing function with better multi-line header support
+    // Custom table drawing function with better multi-line header support and proper padding
     const drawTable = (
       headers: string[],
       rows: string[][],
@@ -120,16 +120,18 @@ export default function AuditReportSystem() {
       multiLineHeaders = false,
     ) => {
       let currentY = startY
-      const baseRowHeight = 8
-      const cellPadding = 2
+      const baseRowHeight = 10 // Increased from 8 to 10 for better spacing
+      const cellPadding = 3 // Increased from 2 to 3 for better padding
+      const lineHeight = 3.5 // Increased from 3 to 3.5 for better readability
+      const minHeaderHeight = multiLineHeaders ? 18 : 10 // Increased minimum heights
 
       // Calculate header height based on content
-      let headerHeight = baseRowHeight
+      let headerHeight = minHeaderHeight
       if (multiLineHeaders) {
-        headerHeight = 16 // Increased height for multi-line headers
         headers.forEach((header, index) => {
-          const lines = pdf.splitTextToSize(header, columnWidths[index] - cellPadding * 2)
-          const requiredHeight = Math.max(lines.length * 4 + 8, 16)
+          const availableWidth = columnWidths[index] - cellPadding * 2
+          const lines = pdf.splitTextToSize(header, availableWidth)
+          const requiredHeight = lines.length * lineHeight + cellPadding * 2
           headerHeight = Math.max(headerHeight, requiredHeight)
         })
       }
@@ -144,26 +146,35 @@ export default function AuditReportSystem() {
         "F",
       )
 
-      // Draw header text
+      // Draw header text with proper padding
       pdf.setTextColor(255, 255, 255)
       pdf.setFontSize(7)
       pdf.setFont("helvetica", "bold")
 
       let currentX = 20
       headers.forEach((header, index) => {
+        const availableWidth = columnWidths[index] - cellPadding * 2
+        const lines = pdf.splitTextToSize(header, availableWidth)
+
         if (multiLineHeaders) {
-          const lines = pdf.splitTextToSize(header, columnWidths[index] - cellPadding * 2)
-          const startTextY = currentY + 4 + (headerHeight - lines.length * 3) / 2
+          // Center text vertically with proper padding
+          const totalTextHeight = lines.length * lineHeight
+          const startTextY = currentY + cellPadding + lineHeight - 0.5
+
           lines.forEach((line: string, lineIndex: number) => {
-            pdf.text(line, currentX + cellPadding, startTextY + lineIndex * 3)
+            pdf.text(line, currentX + cellPadding, startTextY + lineIndex * lineHeight)
           })
         } else {
-          pdf.text(header, currentX + cellPadding, currentY + 5)
+          // Single line header - vertically centered
+          pdf.text(header, currentX + cellPadding, currentY + headerHeight / 2 + 1.5)
         }
         currentX += columnWidths[index]
       })
 
       currentY += headerHeight
+
+      // Store row heights for border drawing
+      const rowHeights: number[] = []
 
       // Draw rows
       pdf.setTextColor(colors.dark.r, colors.dark.g, colors.dark.b)
@@ -171,13 +182,16 @@ export default function AuditReportSystem() {
       pdf.setFont("helvetica", "normal")
 
       rows.forEach((row, rowIndex) => {
-        // Calculate row height based on content
+        // Calculate row height based on content with better padding
         let rowHeight = baseRowHeight
         row.forEach((cell, cellIndex) => {
-          const lines = pdf.splitTextToSize(cell.toString(), columnWidths[cellIndex] - cellPadding * 2)
-          const requiredHeight = Math.max(lines.length * 3 + 5, baseRowHeight)
+          const availableWidth = columnWidths[cellIndex] - cellPadding * 2
+          const lines = pdf.splitTextToSize(cell.toString(), availableWidth)
+          const requiredHeight = lines.length * lineHeight + cellPadding * 2
           rowHeight = Math.max(rowHeight, requiredHeight)
         })
+
+        rowHeights.push(rowHeight)
 
         // Alternate row colors
         if (rowIndex % 2 === 0) {
@@ -205,13 +219,20 @@ export default function AuditReportSystem() {
             pdf.setFont("helvetica", "normal")
           }
 
-          // Wrap text and center vertically
-          const maxWidth = columnWidths[cellIndex] - cellPadding * 2
-          const lines = pdf.splitTextToSize(cell.toString(), maxWidth)
-          const startTextY = currentY + 3 + (rowHeight - lines.length * 3) / 2
+          // Wrap text with proper padding
+          const availableWidth = columnWidths[cellIndex] - cellPadding * 2
+          const lines = pdf.splitTextToSize(cell.toString(), availableWidth)
 
-          lines.slice(0, Math.floor(rowHeight / 3)).forEach((line: string, lineIndex: number) => {
-            pdf.text(line, currentX + cellPadding, startTextY + lineIndex * 3)
+          // Start text with top padding
+          const startTextY = currentY + cellPadding + lineHeight - 0.5
+
+          // Draw each line with consistent spacing
+          lines.forEach((line: string, lineIndex: number) => {
+            const textY = startTextY + lineIndex * lineHeight
+            // Only draw if text fits within cell
+            if (textY <= currentY + rowHeight - cellPadding) {
+              pdf.text(line, currentX + cellPadding, textY)
+            }
           })
 
           currentX += columnWidths[cellIndex]
@@ -230,9 +251,8 @@ export default function AuditReportSystem() {
       borderY += headerHeight
       pdf.line(20, borderY, 20 + columnWidths.reduce((a, b) => a + b, 0), borderY) // Header bottom
 
-      rows.forEach((row, rowIndex) => {
-        const rowHeight = baseRowHeight // Use consistent height for borders
-        borderY += rowHeight
+      rowHeights.forEach((height) => {
+        borderY += height
         pdf.line(20, borderY, 20 + columnWidths.reduce((a, b) => a + b, 0), borderY)
       })
 
@@ -861,7 +881,7 @@ Some of the evidence found during the assessment are used in this report to supp
     await addDetailedObservations()
 
     // Add page numbers and footers
-    const pageCount = pdf.internal.getNumberOfPages()
+    const pageCount = pdf.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
       pdf.setPage(i)
 

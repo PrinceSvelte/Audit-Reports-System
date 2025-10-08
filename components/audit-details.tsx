@@ -1,4 +1,6 @@
 "use client"
+import { useState } from "react"
+import { format } from "date-fns"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
@@ -16,11 +18,37 @@ interface AuditDetailsProps {
 }
 
 export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
+  const [fromDate, setFromDate] = useState<Date | undefined>()
+  const [toDate, setToDate] = useState<Date | undefined>()
+
   const updateField = (field: keyof AuditDetails, value: string) => {
     onChange({
       ...data,
       [field]: value,
     })
+  }
+
+  const handleFromDateSelect = (date: Date | undefined) => {
+    setFromDate(date)
+    updatePeriod(date, toDate)
+  }
+
+  const handleToDateSelect = (date: Date | undefined) => {
+    setToDate(date)
+    updatePeriod(fromDate, date)
+  }
+
+  const updatePeriod = (from: Date | undefined, to: Date | undefined) => {
+    if (from && to) {
+      const formattedRange = `${format(from, "dd-MM-yyyy")} to ${format(to, "dd-MM-yyyy")}`
+      updateField("period", formattedRange)
+    } else if (from) {
+      const formattedDate = `${format(from, "dd-MM-yyyy")} to DD-MM-YYYY`
+      updateField("period", formattedDate)
+    } else if (to) {
+      const formattedDate = `DD-MM-YYYY to ${format(to, "dd-MM-yyyy")}`
+      updateField("period", formattedDate)
+    }
   }
 
   return (
@@ -69,12 +97,30 @@ export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
           <TableRow>
             <TableCell className="font-medium bg-gray-100">Period</TableCell>
             <TableCell>
-              <Input
-                value={data.period}
-                onChange={(e) => updateField("period", e.target.value)}
-                placeholder="DD-MM-YYYY to DD-MM-YYYY"
-                className="border-0 bg-transparent"
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={fromDate ? format(fromDate, "yyyy-MM-dd") : ""}
+                  onChange={(e) => {
+                    const date = e.target.value ? new Date(e.target.value) : undefined
+                    handleFromDateSelect(date)
+                  }}
+                  className="border-0 bg-transparent"
+                  placeholder="From Date"
+                />
+                <span className="text-muted-foreground">to</span>
+                <Input
+                  type="date"
+                  value={toDate ? format(toDate, "yyyy-MM-dd") : ""}
+                  onChange={(e) => {
+                    const date = e.target.value ? new Date(e.target.value) : undefined
+                    handleToDateSelect(date)
+                  }}
+                  min={fromDate ? format(fromDate, "yyyy-MM-dd") : undefined}
+                  className="border-0 bg-transparent"
+                  placeholder="To Date"
+                />
+              </div>
             </TableCell>
           </TableRow>
         </TableBody>

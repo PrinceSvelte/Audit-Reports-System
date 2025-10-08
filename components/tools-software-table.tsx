@@ -15,7 +15,7 @@ interface ToolSoftware {
 }
 
 const ToolsSoftwareTable = forwardRef((props, ref) => {
-  const [data, setData] = useState<ToolSoftware[]>([{ sNo: "", name: "", version: "", license: "Open Source" }])
+  const [data, setData] = useState<ToolSoftware[]>([{ sNo: "1", name: "", version: "", license: "Open Source" }])
 
   useImperativeHandle(ref, () => ({
     getData: () => data,
@@ -23,7 +23,7 @@ const ToolsSoftwareTable = forwardRef((props, ref) => {
 
   const addRow = () => {
     const newRow: ToolSoftware = {
-      sNo: "",
+      sNo: (data.length + 1).toString(),
       name: "",
       version: "",
       license: "Open Source",
@@ -38,7 +38,13 @@ const ToolsSoftwareTable = forwardRef((props, ref) => {
   }
 
   const deleteRow = (index: number) => {
-    setData(data.filter((_, i) => i !== index))
+    const filtered = data.filter((_, i) => i !== index)
+    // Renumber the remaining rows
+    const renumbered = filtered.map((item, idx) => ({
+      ...item,
+      sNo: (idx + 1).toString(),
+    }))
+    setData(renumbered)
   }
 
   return (
@@ -67,8 +73,8 @@ const ToolsSoftwareTable = forwardRef((props, ref) => {
               <TableCell>
                 <Input
                   value={item.sNo}
-                  onChange={(e) => updateRow(index, "sNo", e.target.value)}
-                  className="text-center"
+                  readOnly
+                  className="text-center bg-gray-100"
                 />
               </TableCell>
               <TableCell>

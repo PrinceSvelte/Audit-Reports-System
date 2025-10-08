@@ -134,6 +134,42 @@ const DetailedObservationTable = forwardRef((props, ref) => {
     setData(updated)
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (observationIndex: number, pocIndex: number, e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      handleImageUpload(observationIndex, pocIndex, files)
+    }
+  }
+
+  const handlePaste = (observationIndex: number, pocIndex: number, e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items
+    const imageFiles: File[] = []
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile()
+        if (file) {
+          imageFiles.push(file)
+        }
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      e.preventDefault()
+      const dataTransfer = new DataTransfer()
+      imageFiles.forEach(file => dataTransfer.items.add(file))
+      handleImageUpload(observationIndex, pocIndex, dataTransfer.files)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -309,20 +345,28 @@ const DetailedObservationTable = forwardRef((props, ref) => {
 
                         {/* Image Upload Section */}
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
+                          <div
+                            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(obsIndex, pocIndex, e)}
+                            onPaste={(e) => handlePaste(obsIndex, pocIndex, e)}
+                            onClick={() => {
+                              const key = `${obsIndex}-${pocIndex}`
+                              fileInputRefs.current[key]?.click()
+                            }}
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
                                 const key = `${obsIndex}-${pocIndex}`
                                 fileInputRefs.current[key]?.click()
-                              }}
-                            >
-                              <Upload className="w-4 h-4 mr-2" />
-                              Upload Images
-                            </Button>
-                            <span className="text-sm text-gray-500">{poc.images.length} image(s) uploaded</span>
+                              }
+                            }}
+                          >
+                            <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                            <p className="text-sm font-medium text-gray-700">Upload / Drop / Paste Images</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {poc.images.length} image(s) uploaded
+                            </p>
                           </div>
 
                           <input

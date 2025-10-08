@@ -22,7 +22,7 @@ interface EngagementScope {
 const EngagementScopeTable = forwardRef((props, ref) => {
   const [data, setData] = useState<EngagementScope[]>([
     {
-      sNo: "",
+      sNo: "1",
       assetDescription: "",
       criticality: "",
       internalIP: "",
@@ -41,7 +41,7 @@ const EngagementScopeTable = forwardRef((props, ref) => {
 
   const addRow = () => {
     const newRow: EngagementScope = {
-      sNo: "",
+      sNo: (data.length + 1).toString(),
       assetDescription: "",
       criticality: "",
       internalIP: "",
@@ -62,7 +62,13 @@ const EngagementScopeTable = forwardRef((props, ref) => {
   }
 
   const deleteRow = (index: number) => {
-    setData(data.filter((_, i) => i !== index))
+    const filtered = data.filter((_, i) => i !== index)
+    // Renumber the remaining rows
+    const renumbered = filtered.map((item, idx) => ({
+      ...item,
+      sNo: (idx + 1).toString(),
+    }))
+    setData(renumbered)
   }
 
   return (
@@ -104,8 +110,8 @@ const EngagementScopeTable = forwardRef((props, ref) => {
                 <TableCell>
                   <Input
                     value={item.sNo}
-                    onChange={(e) => updateRow(index, "sNo", e.target.value)}
-                    className="text-center"
+                    readOnly
+                    className="text-center bg-gray-100"
                   />
                 </TableCell>
                 <TableCell>

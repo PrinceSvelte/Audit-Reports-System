@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, forwardRef, useImperativeHandle } from "react"
+import { useState, useRef, forwardRef, useImperativeHandle, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Upload, X } from "lucide-react"
+// import { useToast } from "@/components/ui/use-toast"
 
 interface ProofOfConcept {
   id: string
@@ -32,6 +33,7 @@ interface DetailedObservation {
 }
 
 const DetailedObservationTable = forwardRef((props, ref) => {
+  // const { toast } = useToast()
   const [data, setData] = useState<DetailedObservation[]>([
     {
       vulnerabilityTitle: "",
@@ -70,7 +72,12 @@ const DetailedObservationTable = forwardRef((props, ref) => {
       newOrRepeat: "New",
       proofOfConcepts: [],
     }
-    setData([...data, newObservation])
+    setData((prev) => [...prev, newObservation])
+
+    // toast({
+    //   title: "New Observation Table Added!",
+    //   description: "A new observation section has been created successfully.",
+    // })
   }
 
   const updateObservation = (index: number, field: keyof DetailedObservation, value: any) => {
@@ -114,6 +121,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
     setData(updated)
   }
 
+  // Handle drag/drop and paste image upload
   const handleImageUpload = (observationIndex: number, pocIndex: number, files: FileList | null) => {
     if (files) {
       const updated = [...data]
@@ -134,26 +142,50 @@ const DetailedObservationTable = forwardRef((props, ref) => {
     setData(updated)
   }
 
+  // Enable paste image upload (Ctrl+V)
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+      const files = Array.from(items)
+        .filter((item) => item.type.startsWith("image/"))
+        .map((item) => item.getAsFile())
+        .filter(Boolean) as File[]
+      if (files.length > 0 && data.length > 0) {
+        // Add to last observation and last PoC
+        const lastObsIndex = data.length - 1
+        const lastPocIndex = data[lastObsIndex].proofOfConcepts.length - 1
+        if (lastPocIndex >= 0) {
+          const updated = [...data]
+          updated[lastObsIndex].proofOfConcepts[lastPocIndex].images.push(...files)
+          setData(updated)
+        }
+      }
+    }
+
+    window.addEventListener("paste", handlePaste)
+    return () => window.removeEventListener("paste", handlePaste)
+  }, [data])
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Detailed Observation</h3>
-        <Button onClick={addObservation} size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Observation
-        </Button>
-      </div>
-
       {data.map((observation, obsIndex) => (
         <Card key={obsIndex} className="border-2">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between bg-gray-50">
             <CardTitle className="text-base">Observation #{obsIndex + 1}</CardTitle>
-            <Button variant="destructive" size="sm" onClick={() => deleteObservation(obsIndex)}>
-              <Trash2 className="text-white w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={addObservation} size="sm" variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Observation
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => deleteObservation(obsIndex)}>
+                <Trash2 className="text-white w-4 h-4" />
+              </Button>
+            </div>
           </CardHeader>
+
           <CardContent className="space-y-4">
-            {/* Basic Information Table */}
+            {/* Basic Info Table (unchanged) */}
             <Table>
               <TableBody>
                 <TableRow>
@@ -166,7 +198,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium bg-gray-100">Affected Asset i.e., IP/URL/Application</TableCell>
+                  <TableCell className="font-medium bg-gray-100">Affected Asset (IP/URL/Application)</TableCell>
                   <TableCell>
                     <Input
                       value={observation.affectedAsset}
@@ -175,7 +207,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium bg-gray-100">Detailed observation / Vulnerable point</TableCell>
+                  <TableCell className="font-medium bg-gray-100">Detailed Observation / Vulnerable Point</TableCell>
                   <TableCell>
                     <Textarea
                       value={observation.detailedObservation}
@@ -187,10 +219,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                 <TableRow>
                   <TableCell className="font-medium bg-gray-100">CVE/CWE</TableCell>
                   <TableCell>
-                    <Input
-                      value={observation.cve}
-                      onChange={(e) => updateObservation(obsIndex, "cve", e.target.value)}
-                    />
+                    <Input value={observation.cve} onChange={(e) => updateObservation(obsIndex, "cve", e.target.value)} />
                   </TableCell>
                 </TableRow>
                 <TableRow>
@@ -259,7 +288,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium bg-gray-100">New or Repeat observation</TableCell>
+                  <TableCell className="font-medium bg-gray-100">New or Repeat Observation</TableCell>
                   <TableCell>
                     <Select
                       value={observation.newOrRepeat}
@@ -278,10 +307,10 @@ const DetailedObservationTable = forwardRef((props, ref) => {
               </TableBody>
             </Table>
 
-            {/* Proof of Concept Section */}
+            {/* Proof of Concept Section remains same as before */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h4 className="font-semibold bg-gray-100 p-2 rounded">References to evidence / Proof of Concept</h4>
+                <h4 className="font-semibold bg-gray-100 p-2 rounded">References to Evidence / Proof of Concept</h4>
                 <Button onClick={() => addProofOfConcept(obsIndex)} size="sm" variant="outline">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Proof of Concept
@@ -291,7 +320,14 @@ const DetailedObservationTable = forwardRef((props, ref) => {
               {observation.proofOfConcepts.map((poc, pocIndex) => (
                 <Card key={poc.id} className="border border-gray-200">
                   <CardContent className="p-4 space-y-4">
-                    <div className="flex justify-between items-start">
+                    <div
+                      className="flex justify-between items-start border-2 border-dashed rounded-lg p-3"
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        handleImageUpload(obsIndex, pocIndex, e.dataTransfer.files)
+                      }}
+                      onDragOver={(e) => e.preventDefault()}
+                    >
                       <div className="flex-1 space-y-3">
                         <div className="flex items-center gap-4">
                           <Input
@@ -307,7 +343,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                           />
                         </div>
 
-                        {/* Image Upload Section */}
+                        {/* Image Upload */}
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Button
@@ -320,7 +356,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                               }}
                             >
                               <Upload className="w-4 h-4 mr-2" />
-                              Upload Images
+                              Upload / Drop / Paste Images
                             </Button>
                             <span className="text-sm text-gray-500">{poc.images.length} image(s) uploaded</span>
                           </div>
@@ -337,24 +373,16 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                             onChange={(e) => handleImageUpload(obsIndex, pocIndex, e.target.files)}
                           />
 
-                          {/* Display uploaded images */}
                           {poc.images.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                               {poc.images.map((image, imageIndex) => (
                                 <div key={imageIndex} className="relative group">
-                                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
-                                    <img
-                                      src={URL.createObjectURL(image) || "/placeholder.svg"}
-                                      alt={`Proof of concept ${imageIndex + 1}`}
-                                      className="w-full h-full object-cover"
-                                      onLoad={(e) => {
-                                        // Clean up object URL after image loads
-                                        const img = e.target as HTMLImageElement
-                                        setTimeout(() => URL.revokeObjectURL(img.src), 1000)
-                                      }}
-                                    />
-                                  </div>
-                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                  <img
+                                    src={URL.createObjectURL(image)}
+                                    alt={`Proof ${imageIndex + 1}`}
+                                    className="w-full h-32 object-cover rounded-lg border"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-lg">
                                     <Button
                                       variant="destructive"
                                       size="sm"
@@ -363,7 +391,7 @@ const DetailedObservationTable = forwardRef((props, ref) => {
                                       <X className="w-4 h-4" />
                                     </Button>
                                   </div>
-                                  <p className="text-xs text-gray-600 mt-1 truncate">{image.name}</p>
+                                  <p className="text-xs truncate mt-1 text-gray-600">{image.name}</p>
                                 </div>
                               ))}
                             </div>

@@ -329,47 +329,61 @@ export default function AuditReportSystem() {
     const addTableOfContents = () => {
       yPosition = addGradientHeader("TABLE OF CONTENTS")
 
+  
       const tocItems = [
-        { title: "1. Document Preparation", page: 3 },
-        { title: "2. Change History", page: 4 },
-        { title: "3. Distribution List", page: 5 },
-        { title: "4. Introduction", page: 6 },
-        { title: "5. Engagement Scope", page: 7 },
-        { title: "6. Auditing Team", page: 8 },
-        { title: "7. Audit Activities", page: 9 },
-        { title: "8. Audit Methodology", page: 10 },
-        { title: "9. Pre-engagement", page: 11 },
-        { title: "10. Engagement", page: 12 },
-        { title: "11. Post-Engagement", page: 13 },
-        { title: "12. Risk Assessment Methodology", page: 14 },
-        { title: "13. Tools & Software", page: 15 },
-        { title: "14. Executive Summary", page: 16 },
-        { title: "15. Vulnerabilities Summary", page: 17 },
-        { title: "16. Detailed Observations", page: 18 },
+        "1. Document Preparation",
+        "2. Change History", 
+        "3. Distribution List",
+        "4. Introduction",
+        "5. Engagement Scope",
+        "6. Auditing Team",
+        "7. Audit Activities",
+        "8. Audit Methodology",
+        "9. Pre-engagement",
+        "10. Engagement",
+        "11. Post-Engagement",
+        "12. Risk Assessment Methodology",
+        "13. Tools & Software",
+        "14. Executive Summary",
+        "15. Vulnerabilities Summary",
+        "16. Detailed Observations",
       ]
 
       pdf.setTextColor(colors.dark.r, colors.dark.g, colors.dark.b)
       pdf.setFontSize(11)
-
+    
       tocItems.forEach((item) => {
         pdf.setFont("helvetica", "normal")
-        pdf.text(item.title, 25, yPosition)
-
-        // Dotted line
-        const titleWidth = pdf.getTextWidth(item.title)
-        const pageWidth = pdf.getTextWidth(item.page.toString())
-        const dotsWidth = 165 - titleWidth - pageWidth
-        const dotsCount = Math.floor(dotsWidth / 2)
-        pdf.text(".".repeat(dotsCount), 25 + titleWidth + 2, yPosition)
-
-        pdf.setFont("helvetica", "bold")
-        pdf.text(item.page.toString(), 170, yPosition)
-
+        pdf.text(item, 25, yPosition)
+    
         yPosition += 8
       })
-
+    
       pdf.addPage()
       yPosition = 20
+
+      // pdf.setTextColor(colors.dark.r, colors.dark.g, colors.dark.b)
+      // pdf.setFontSize(11)
+
+      // tocItems.forEach((item) => {
+      //   pdf.setFont("helvetica", "normal")
+      //   pdf.text(item.title, 25, yPosition)
+
+      //   // Dotted line
+      //   const titleWidth = pdf.getTextWidth(item.title)
+      //   // const pageWidth = pdf.getTextWidth(item.page.toString())
+      //   const dotsWidth = 165 - titleWidth - pageWidth
+      //   const dotsCount = Math.floor(dotsWidth / 2)
+      //   pdf.text(".".repeat(dotsCount), 25 + titleWidth + 2, yPosition)
+
+      //   pdf.setFont("helvetica", "bold")
+      //   pdf.text(item.page.toString(), 170, yPosition)
+
+      //   yPosition += 8
+      // })
+
+      // pdf.addPage()
+      // yPosition = 20
     }
 
     // Document Preparation
@@ -381,7 +395,7 @@ export default function AuditReportSystem() {
 
       const tableData = data.documentPreparation?.map((item: any) => [item.field, item.value]) || []
       if (tableData.length > 0) {
-        yPosition = drawTable(["Field", "Value"], tableData, yPosition, [60, 110], colors.primary)
+        yPosition = drawTable(["Document", "Preparation"], tableData, yPosition, [60, 110], colors.primary)
       }
     }
 
@@ -1001,20 +1015,20 @@ This report has been produced based on the output of the Security Assessment. Al
   })
 
   const [editableHeaders, setEditableHeaders] = useState({
-    documentControl: "Document Control - Page 2",
-    tableOfContents: "Table of Contents - Page 3",
-    introduction: "Introduction - Page 4",
-    engagementScope: "Engagement Scope - Page 5",
-    auditingTeam: "Details of the Auditing Team - Page 6",
-    auditActivities: "Audit Activities and Timelines - Page 7",
-    auditMethodology: "Audit Methodology and Criteria / Standard referred for Audit - Page 8",
-    preEngagement: "Pre-engagement - Page 9",
-    engagement: "Engagement - Page 10",
-    postEngagement: "Post-Engagement - Page 11",
-    riskMethodology: "Risk Assessment Methodology - Page 12",
-    toolsSoftware: "Tools/Software Used - Page 13",
-    vulnerability: "Vulnerability Overview - Page 14",
-    detailedObservation: "Detailed Observation - Page 15",
+    documentControl: "Document Control ",
+    tableOfContents: "Table of Contents",
+    introduction: "Introduction",
+    engagementScope: "Engagement Scope",
+    auditingTeam: "Details of the Auditing Team",
+    auditActivities: "Audit Activities and Timelines",
+    auditMethodology: "Audit Methodology and Criteria / Standard referred for Audit",
+    preEngagement: "Pre-engagement",
+    engagement: "Engagement",
+    postEngagement: "Post-Engagement",
+    riskMethodology: "Risk Assessment Methodology",
+    toolsSoftware: "Tools/Software Used",
+    vulnerability: "Vulnerability Overview",
+    detailedObservation: "Detailed Observation",
     documentPreparation: "Document Preparation",
     changeHistory: "Document Change History",
     distributionList: "Document Distribution List",

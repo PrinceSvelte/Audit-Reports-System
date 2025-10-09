@@ -57,31 +57,39 @@ export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
       <Table>
         <TableBody>
           <TableRow>
-            <TableCell className="font-medium bg-gray-100 w-1/3">Report Release Date</TableCell>
+            <TableCell className="font-medium bg-gray-100 w-1/3">
+              Report Release Date <span className="text-red-500">*</span>
+            </TableCell>
             <TableCell>
               <Input
                 type="date"
                 value={data.reportReleaseDate}
                 onChange={(e) => updateField("reportReleaseDate", e.target.value)}
                 className="border-0 bg-transparent"
+                required
               />
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium bg-gray-100">Type of Audit</TableCell>
+            <TableCell className="font-medium bg-gray-100">
+              Type of Audit <span className="text-red-500">*</span>
+            </TableCell>
             <TableCell>
               <Input
                 value={data.typeOfAudit}
                 onChange={(e) => updateField("typeOfAudit", e.target.value)}
                 placeholder="Enter audit type (e.g., Web Application Security Assessment)"
                 className="border-0 bg-transparent"
+                required
               />
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium bg-gray-100">Type of Audit Report</TableCell>
+            <TableCell className="font-medium bg-gray-100">
+              Type of Audit Report <span className="text-red-500">*</span>
+            </TableCell>
             <TableCell>
-              <Select value={data.typeOfAuditReport} onValueChange={(value) => updateField("typeOfAuditReport", value)}>
+              <Select value={data.typeOfAuditReport} onValueChange={(value) => updateField("typeOfAuditReport", value)} required>
                 <SelectTrigger className="border-0 bg-transparent">
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
@@ -95,7 +103,9 @@ export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="font-medium bg-gray-100">Period</TableCell>
+            <TableCell className="font-medium bg-gray-100">
+              Period <span className="text-red-500">*</span>
+            </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <Input
@@ -107,6 +117,7 @@ export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
                   }}
                   className="border-0 bg-transparent"
                   placeholder="From Date"
+                  required
                 />
                 <span className="text-muted-foreground">to</span>
                 <Input
@@ -119,6 +130,7 @@ export default function AuditDetails({ data, onChange }: AuditDetailsProps) {
                   min={fromDate ? format(fromDate, "yyyy-MM-dd") : undefined}
                   className="border-0 bg-transparent"
                   placeholder="To Date"
+                  required
                 />
               </div>
             </TableCell>

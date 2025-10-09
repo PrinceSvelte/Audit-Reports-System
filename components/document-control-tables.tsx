@@ -103,7 +103,9 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
           <TableBody>
             {docPreparation.map((item, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium bg-gray-100 w-1/3">{item.field}</TableCell>
+                <TableCell className="font-medium bg-gray-100 w-1/3">
+                  {item.field} <span className="text-red-500">*</span>
+                </TableCell>
                 <TableCell>
                   {item.field.toLowerCase().includes("date") ? (
                     <Input
@@ -111,12 +113,15 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                       value={item.value}
                       onChange={(e) => updateDocPreparation(index, "value", e.target.value)}
                       className="border-0 bg-transparent"
+                      required
                     />
                   ) : (
                     <Input
                       value={item.value}
                       onChange={(e) => updateDocPreparation(index, "value", e.target.value)}
                       className="border-0 bg-transparent"
+                      required
+                      placeholder={`Enter ${item.field.toLowerCase()}`}
                     />
                   )}
                 </TableCell>
@@ -141,9 +146,9 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-200">
-              <TableHead className="text-center font-semibold">Version</TableHead>
-              <TableHead className="text-center font-semibold">Date</TableHead>
-              <TableHead className="text-center font-semibold">Remarks / Reason of change</TableHead>
+              <TableHead className="text-center font-semibold">Version <span className="text-red-500">*</span></TableHead>
+              <TableHead className="text-center font-semibold">Date <span className="text-red-500">*</span></TableHead>
+              <TableHead className="text-center font-semibold">Remarks / Reason of change <span className="text-red-500">*</span></TableHead>
               <TableHead className="text-center font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -155,6 +160,8 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                     value={item.version}
                     onChange={(e) => updateChangeHistory(index, "version", e.target.value)}
                     className="text-center"
+                    required
+                    placeholder="e.g., 1.0"
                   />
                 </TableCell>
                 <TableCell>
@@ -163,6 +170,7 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                     value={item.date}
                     onChange={(e) => updateChangeHistory(index, "date", e.target.value)}
                     className="text-center"
+                    required
                   />
                 </TableCell>
                 <TableCell>
@@ -170,6 +178,8 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                     value={item.remarks}
                     onChange={(e) => updateChangeHistory(index, "remarks", e.target.value)}
                     className="text-center"
+                    required
+                    placeholder="Enter remarks"
                   />
                 </TableCell>
                 <TableCell className="text-center">
@@ -198,9 +208,9 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-200">
-              <TableHead className="text-center font-semibold">Name</TableHead>
-              <TableHead className="text-center font-semibold">Designation</TableHead>
-              <TableHead className="text-center font-semibold">Email ID</TableHead>
+              <TableHead className="text-center font-semibold">Name <span className="text-red-500">*</span></TableHead>
+              <TableHead className="text-center font-semibold">Designation <span className="text-red-500">*</span></TableHead>
+              <TableHead className="text-center font-semibold">Email ID <span className="text-red-500">*</span></TableHead>
               <TableHead className="text-center font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -212,6 +222,8 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                     value={item.name}
                     onChange={(e) => updateDistributionList(index, "name", e.target.value)}
                     className="text-center"
+                    required
+                    placeholder="Enter name"
                   />
                 </TableCell>
                 <TableCell>
@@ -219,13 +231,18 @@ const DocumentControlTables = forwardRef<any, DocumentControlTablesProps>(({ onH
                     value={item.designation}
                     onChange={(e) => updateDistributionList(index, "designation", e.target.value)}
                     className="text-center"
+                    required
+                    placeholder="Enter designation"
                   />
                 </TableCell>
                 <TableCell>
                   <Input
+                    type="email"
                     value={item.email}
                     onChange={(e) => updateDistributionList(index, "email", e.target.value)}
                     className="text-center"
+                    required
+                    placeholder="Enter email"
                   />
                 </TableCell>
                 <TableCell className="text-center">

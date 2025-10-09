@@ -1093,7 +1093,37 @@ This report has been produced based on the output of the Security Assessment. Al
     }
   }
 
+  const validateRequiredFields = () => {
+    const errors: string[] = []
+
+    // Validate audit details
+    if (!auditDetails.reportReleaseDate) errors.push("Report Release Date")
+    if (!auditDetails.typeOfAudit) errors.push("Type of Audit")
+    if (!auditDetails.typeOfAuditReport) errors.push("Type of Audit Report")
+    if (!auditDetails.period) errors.push("Period")
+
+    // Validate document preparation
+    const docPrep = documentControlRef.current?.getDocumentPreparation() || []
+    docPrep.forEach((item: any, index: number) => {
+      if (!item.value) errors.push(`Document Preparation - ${item.field}`)
+    })
+
+    if (errors.length > 0) {
+      toast({
+        title: "Missing Required Fields",
+        description: `Please fill in the following fields: ${errors.slice(0, 3).join(", ")}${errors.length > 3 ? ` and ${errors.length - 3} more...` : ""}`,
+        variant: "destructive",
+      })
+      return false
+    }
+    return true
+  }
+
   const exportToPDF = async () => {
+    if (!validateRequiredFields()) {
+      return
+    }
+
     setIsExporting(true)
     try {
       const exportData = collectAllData()
@@ -1140,6 +1170,10 @@ This report has been produced based on the output of the Security Assessment. Al
   }
 
   const exportToWord = async () => {
+    if (!validateRequiredFields()) {
+      return
+    }
+
     setIsExporting(true)
     try {
       const exportData: ExportData = collectAllData()
@@ -1193,15 +1227,14 @@ This report has been produced based on the output of the Security Assessment. Al
                 <FileText className="w-4 h-4" />
                 {isExporting ? "Generating..." : "Export PDF"}
               </Button>
-              {/* <Button
+              <Button
                 onClick={() => setShowWordDialog(true)}
-                variant="outline"
-                className="flex items-center gap-2 border-white text-white hover:bg-white hover:text-blue-600"
+                className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-100"
                 disabled={isExporting}
               >
                 <Download className="w-4 h-4" />
                 {isExporting ? "Generating..." : "Export Word"}
-              </Button> */}
+              </Button>
             </div>
           </div>
         </div>

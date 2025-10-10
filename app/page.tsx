@@ -24,6 +24,8 @@ import "jspdf-autotable"
 import EditableHeader from "@/components/editable-header"
 // Import report saving utilities
 import { saveReportToDatabase, extractScreenshotKeys } from "@/lib/report-storage"
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 // Declare the autoTable method for TypeScript
 declare module "jspdf" {
@@ -880,29 +882,8 @@ Some of the evidence found during the assessment are used in this report to supp
     addVulnerabilitiesSummary()
     await addDetailedObservations()
 
-    // Add page numbers and footers
-    const pageCount = pdf.getNumberOfPages()
-    for (let i = 1; i <= pageCount; i++) {
-      pdf.setPage(i)
-
-      // Skip cover page
-      if (i > 1) {
-        // Footer line
-        pdf.setDrawColor(200, 200, 200)
-        pdf.line(20, 285, 190, 285)
-
-        // Page number
-        pdf.setFontSize(8)
-        pdf.setTextColor(colors.medium.r, colors.medium.g, colors.medium.b)
-        pdf.text(`Page ${i} of ${pageCount}`, 190, 290, { align: "right" })
-
-        // Document title
-        pdf.text("Security Audit Report", 20, 290)
-
-        // Date
-        pdf.text(new Date().toLocaleDateString(), 105, 290, { align: "center" })
-      }
-    }
+    // Remove page numbers and footers from PDF
+    // (The previous code that added page numbers has been removed)
 
     return pdf
   }
@@ -1021,20 +1002,20 @@ This report has been produced based on the output of the Security Assessment. Al
   })
 
   const [editableHeaders, setEditableHeaders] = useState({
-    documentControl: "Document Control - Page 2",
-    tableOfContents: "Table of Contents - Page 3",
-    introduction: "Introduction - Page 4",
-    engagementScope: "Engagement Scope - Page 5",
-    auditingTeam: "Details of the Auditing Team - Page 6",
-    auditActivities: "Audit Activities and Timelines - Page 7",
-    auditMethodology: "Audit Methodology and Criteria / Standard referred for Audit - Page 8",
-    preEngagement: "Pre-engagement - Page 9",
-    engagement: "Engagement - Page 10",
-    postEngagement: "Post-Engagement - Page 11",
-    riskMethodology: "Risk Assessment Methodology - Page 12",
-    toolsSoftware: "Tools/Software Used - Page 13",
-    vulnerability: "Vulnerability Overview - Page 14",
-    detailedObservation: "Detailed Observation - Page 15",
+    documentControl: "Document Control",
+    tableOfContents: "Table of Contents",
+    introduction: "Introduction",
+    engagementScope: "Engagement Scope",
+    auditingTeam: "Details of the Auditing Team",
+    auditActivities: "Audit Activities and Timelines",
+    auditMethodology: "Audit Methodology and Criteria / Standard referred for Audit",
+    preEngagement: "Pre-engagement",
+    engagement: "Engagement",
+    postEngagement: "Post-Engagement",
+    riskMethodology: "Risk Assessment Methodology",
+    toolsSoftware: "Tools/Software Used",
+    vulnerability: "Vulnerability Overview",
+    detailedObservation: "Detailed Observation",
     documentPreparation: "Document Preparation",
     changeHistory: "Document Change History",
     distributionList: "Document Distribution List",
@@ -1050,7 +1031,7 @@ This report has been produced based on the output of the Security Assessment. Al
   const [showPdfDialog, setShowPdfDialog] = useState(false)
   const [showWordDialog, setShowWordDialog] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
-  const { toast } = useToast()
+  const { toast: shadcnToast } = useToast()
 
   const toggleTable = (tableKey: keyof typeof visibleTables) => {
     setVisibleTables((prev) => ({
@@ -1111,13 +1092,13 @@ This report has been produced based on the output of the Security Assessment. Al
 
       if (saveResult.success) {
         console.log("[v0] Report saved to database:", saveResult.reportId)
-        toast({
+        shadcnToast({
           title: "PDF Generated and Saved",
           description: `Report ID: ${saveResult.reportId}. Your report has been saved to the database.`,
         })
       } else {
         console.error("[v0] Failed to save report:", saveResult.error)
-        toast({
+        shadcnToast({
           title: "PDF Generated (Not Saved)",
           description: "PDF created but failed to save to database. Download will proceed.",
           variant: "destructive",
@@ -1128,7 +1109,7 @@ This report has been produced based on the output of the Security Assessment. Al
       pdf.save(`security-audit-report-${new Date().toISOString().split("T")[0]}.pdf`)
     } catch (error) {
       console.error("PDF Export Error:", error)
-      toast({
+      shadcnToast({
         title: "Export Failed",
         description: "There was an error generating the PDF. Please try again.",
         variant: "destructive",
@@ -1157,13 +1138,13 @@ This report has been produced based on the output of the Security Assessment. Al
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
 
-      toast({
+      shadcnToast({
         title: "Word Document Generated",
         description: "Your audit report has been exported as Word document successfully.",
       })
     } catch (error) {
       console.error("Word Export Error:", error)
-      toast({
+      shadcnToast({
         title: "Export Failed",
         description: "There was an error generating the Word document. Please try again.",
         variant: "destructive",
@@ -1592,36 +1573,15 @@ This report has been produced based on the output of the Security Assessment. Al
               </Button>
             </CardHeader>
             <CardContent>
-              <DetailedObservationTable ref={detailedObservationRef} />
+              <DetailedObservationTable 
+                ref={detailedObservationRef} 
+                onObservationAdded={() => {
+                  toast.success("Observation added successfully!")
+                }}
+              />
             </CardContent>
           </Card>
         )}
-
-        {/* Add Table Button */}
-        <Card className="border-dashed border-2 border-gray-300">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center">
-              <Plus className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Add New Section</h3>
-              <p className="text-gray-500 mb-4">Restore deleted sections or add custom content</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {Object.entries(visibleTables).map(
-                  ([key, visible]) =>
-                    !visible && (
-                      <Button
-                        key={key}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toggleTable(key as keyof typeof visibleTables)}
-                      >
-                        Restore {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                      </Button>
-                    ),
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Confirmation Dialogs */}
         <ConfirmationDialog

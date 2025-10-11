@@ -1,64 +1,52 @@
-"use client"
+"use client";
 
-import { useState, forwardRef, useImperativeHandle } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2 } from "lucide-react"
-
-interface AuditingTeam {
-  sNo: string
-  name: string
-  designation: string
-  email: string
-  qualifications: string
-  certInListed: string
-}
+import { forwardRef, useImperativeHandle } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Trash2 } from "lucide-react";
+import SaveButton from "./SaveButton";
+import { useAuditingTeam } from "@/hooks/useAuditingTeam";
+import { toast } from "@/components/ui/use-toast";
 
 const AuditingTeamTable = forwardRef((props, ref) => {
-  const [data, setData] = useState<AuditingTeam[]>([
-    {
-      sNo: "1",
-      name: "",
-      designation: "",
-      email: "",
-      qualifications: "",
-      certInListed: "Yes",
-    },
-  ])
+  const { data, addRow, updateRow, deleteRow, getData, saveData, isLoading } =
+    useAuditingTeam();
 
   useImperativeHandle(ref, () => ({
-    getData: () => data,
-  }))
+    getData,
+  }));
 
-  const addRow = () => {
-    const newRow: AuditingTeam = {
-      sNo: (data.length + 1).toString(),
-      name: "",
-      designation: "",
-      email: "",
-      qualifications: "",
-      certInListed: "Yes",
+  const handleSave = async () => {
+    try {
+      await saveData();
+      toast({
+        title: "Success",
+        description: "Auditing team data saved successfully!",
+      });
+    } catch (error) {
+      console.error("Error saving auditing team data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save auditing team data. Please try again.",
+        variant: "destructive",
+      });
     }
-    setData([...data, newRow])
-  }
-
-  const updateRow = (index: number, field: keyof AuditingTeam, value: string) => {
-    const updated = [...data]
-    updated[index][field] = value
-    setData(updated)
-  }
-
-  const deleteRow = (index: number) => {
-    const filtered = data.filter((_, i) => i !== index)
-    // Renumber the remaining rows
-    const renumbered = filtered.map((item, idx) => ({
-      ...item,
-      sNo: (idx + 1).toString(),
-    }))
-    setData(renumbered)
-  }
+  };
 
   return (
     <div>
@@ -74,15 +62,26 @@ const AuditingTeamTable = forwardRef((props, ref) => {
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-200">
-              <TableHead className="text-center font-semibold">S. No.</TableHead>
-              <TableHead className="text-center font-semibold">Name</TableHead>
-              <TableHead className="text-center font-semibold">Designation</TableHead>
-              <TableHead className="text-center font-semibold">Email ID</TableHead>
-              <TableHead className="text-center font-semibold">Professional Qualifications / Certifications</TableHead>
               <TableHead className="text-center font-semibold">
-                Whether the resource has been listed in the Snapshot information published on CERT-In's website(Yes/No)
+                S. No.
               </TableHead>
-              <TableHead className="text-center font-semibold">Actions</TableHead>
+              <TableHead className="text-center font-semibold">Name</TableHead>
+              <TableHead className="text-center font-semibold">
+                Designation
+              </TableHead>
+              <TableHead className="text-center font-semibold">
+                Email ID
+              </TableHead>
+              <TableHead className="text-center font-semibold">
+                Professional Qualifications / Certifications
+              </TableHead>
+              <TableHead className="text-center font-semibold">
+                Whether the resource has been listed in the Snapshot information
+                published on CERT-In's website(Yes/No)
+              </TableHead>
+              <TableHead className="text-center font-semibold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -105,7 +104,9 @@ const AuditingTeamTable = forwardRef((props, ref) => {
                 <TableCell>
                   <Input
                     value={item.designation}
-                    onChange={(e) => updateRow(index, "designation", e.target.value)}
+                    onChange={(e) =>
+                      updateRow(index, "designation", e.target.value)
+                    }
                     className="text-center"
                   />
                 </TableCell>
@@ -119,12 +120,19 @@ const AuditingTeamTable = forwardRef((props, ref) => {
                 <TableCell>
                   <Input
                     value={item.qualifications}
-                    onChange={(e) => updateRow(index, "qualifications", e.target.value)}
+                    onChange={(e) =>
+                      updateRow(index, "qualifications", e.target.value)
+                    }
                     className="text-center"
                   />
                 </TableCell>
                 <TableCell>
-                  <Select value={item.certInListed} onValueChange={(value) => updateRow(index, "certInListed", value)}>
+                  <Select
+                    value={item.certInListed}
+                    onValueChange={(value) =>
+                      updateRow(index, "certInListed", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -135,7 +143,11 @@ const AuditingTeamTable = forwardRef((props, ref) => {
                   </Select>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Button variant="destructive" size="sm" onClick={() => deleteRow(index)}>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => deleteRow(index)}
+                  >
                     <Trash2 className="text-white w-4 h-4" />
                   </Button>
                 </TableCell>
@@ -144,10 +156,20 @@ const AuditingTeamTable = forwardRef((props, ref) => {
           </TableBody>
         </Table>
       </div>
+
+      <div className="flex justify-end">
+        <SaveButton
+          onClick={handleSave}
+          isLoading={isLoading}
+          disabled={isLoading}
+        >
+          Save Audit Details
+        </SaveButton>
+      </div>
     </div>
-  )
-})
+  );
+});
 
-AuditingTeamTable.displayName = "AuditingTeamTable"
+AuditingTeamTable.displayName = "AuditingTeamTable";
 
-export default AuditingTeamTable
+export default AuditingTeamTable;

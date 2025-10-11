@@ -1,0 +1,8 @@
+export const AUDIT_REPORT = "/create-report";
+export const UPLOAD_PDF = "/upload-file";
+export const DOCUMENT_PREP = "/sections/documentPreparation";
+export const DOCUMENT_HISTORY = "/sections/changeHistory";
+export const DOCUMENT_LIST = "/sections/distributionList";
+export const ENGAGE_SCOPE = "/sections/engagementScope";
+export const AUDITING_TEAM = "/sections/auditingTeam";
+export const VULNERBILITIES = "/sections/vulnerabilities";

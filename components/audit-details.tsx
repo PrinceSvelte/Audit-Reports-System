@@ -26,7 +26,7 @@ const initialState: AuditDetailsState = {
     fromDate: "",
     toDate: "",
   },
-  file_url: "",
+  pdf_url: "",
 };
 
 export default function AuditDetails() {
@@ -74,7 +74,7 @@ export default function AuditDetails() {
       formData.typeOfAuditReport.trim() !== "" &&
       formData.period.fromDate.trim() !== "" &&
       formData.period.toDate.trim() !== "" &&
-      formData.file_url !== ""
+      formData.pdf_url !== ""
     );
   }, [formData]);
 
@@ -110,7 +110,7 @@ export default function AuditDetails() {
         }) => {
           setFormData((prev) => ({
             ...prev,
-            file_url: response.data.file_url,
+            pdf_url: response.data.file_url,
           }));
         },
         onError: (error) => {

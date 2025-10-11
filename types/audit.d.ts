@@ -10,5 +10,5 @@ export interface AuditDetailsState {
   typeOfAudit: string;
   typeOfAuditReport: string;
   period: Period;
-  file_url: string;
+  pdf_url: string;
 }

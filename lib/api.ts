@@ -1,4 +1,5 @@
-export const API_BASE_URL = "http://192.168.15.244:8006/api/v1/audit-reports";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const AUTH_TOKEN = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
 type ApiMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -19,8 +20,7 @@ export async function apiHandler<TResponse, TBody = unknown>(
 
   // Prepare headers - don't set Content-Type for FormData
   const defaultHeaders: Record<string, string> = {
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2OGU5ZjViOTBlMjI1OTE4MDI5ZTlhZDciLCJleHAiOjE5NDAxNjMyODJ9.HxMSBD7QNIXCrWRYekxQtP8bGBnRaqaVanQ9jqDDHBw",
+    Authorization: `Bearer ${AUTH_TOKEN}`,
     ...headers,
   };
 

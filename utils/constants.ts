@@ -1,3 +1,4 @@
+export const LOGIN = "/api/users/login";
 export const AUDIT_REPORT = "/create-report";
 export const UPLOAD_PDF = "/upload-file";
 export const DOCUMENT_PREP = "/sections/documentPreparation";

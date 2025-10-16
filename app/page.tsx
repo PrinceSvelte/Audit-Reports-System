@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus, Download, FileText } from "lucide-react";
@@ -33,6 +33,7 @@ import TiptapEditor from "@/components/TiptapEditor";
 import { bestPractices } from "@/utils/static-data";
 import WebChecklistTable from "@/components/web-checklist-table";
 import { useReportStore } from "@/lib/report-store";
+import { useRouter } from "next/navigation";
 
 // Declare the autoTable method for TypeScript
 declare module "jspdf" {
@@ -52,6 +53,12 @@ export default function AuditReportSystem() {
   const detailedObservationRef = useRef<any>(null);
 
   const reportID = useReportStore((state) => state.reportId);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) router.push("/login");
+  }, []);
 
   // Modern color palette
   const colors = {
@@ -1403,11 +1410,22 @@ This report has been produced based on the output of the Security Assessment. Al
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 text-white">
           <div className="flex justify-between items-center">
-            <div>
+            <div className="w-full flex items-center justify-between gap-2">
+              <div>
               <h1 className="text-3xl font-bold">Audit Report System</h1>
               <p className="mt-2 opacity-90">
                 Comprehensive security audit documentation
               </p>
+              </div>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("access_token");
+                  router.push("/login");
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+              >
+                Logout
+              </button>
             </div>
 
             {/* <div className="flex gap-3">

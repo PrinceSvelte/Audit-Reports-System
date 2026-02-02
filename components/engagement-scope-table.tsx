@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,9 +26,42 @@ const EngagementScopeTable = forwardRef((props, ref) => {
     getData,
   }));
 
+  // Check if a row has ALL fields filled (excluding sNo)
+  const isRowFilled = useCallback((row: any) => {
+    return !!(
+      row.assetDescription?.trim() &&
+      row.criticality?.trim() &&
+      row.internalIP?.trim() &&
+      row.url?.trim() &&
+      row.publicIP?.trim() &&
+      row.location?.trim() &&
+      row.hashValue?.trim() &&
+      row.version?.trim()
+    );
+  }, []);
+
+  // Check if at least one row has ALL fields filled
+  const hasDataFilled = useMemo(() => {
+    return data.some((row) => isRowFilled(row));
+  }, [data, isRowFilled]);
+
+  // Check if the last row (most recently added) has ALL fields filled
+  const isLastRowFilled = useMemo(() => {
+    if (data.length === 0) return false;
+    return isRowFilled(data[data.length - 1]);
+  }, [data, isRowFilled]);
+
   const handleSave = async () => {
     try {
-      await saveData();
+      // Filter out incomplete rows and renumber sNo
+      const completeRows = data
+        .filter((row) => isRowFilled(row))
+        .map((row, index) => ({
+          ...row,
+          sNo: (index + 1).toString(),
+        }));
+      
+      await saveData(completeRows);
       toast.success("Engagement scope data saved successfully!");
     } catch (error) {
       toast.error("Failed to save engagement scope data. Please try again.");
@@ -39,7 +72,7 @@ const EngagementScopeTable = forwardRef((props, ref) => {
     <div>
       <div className="flex justify-between items-center mb-4 ">
         <h3 className="text-lg font-semibold">Engagement Scope</h3>
-        <Button onClick={addRow} size="sm">
+        <Button onClick={addRow} size="sm" disabled={!isLastRowFilled}>
           <Plus className="w-4 h-4 mr-2" />
           Add Row
         </Button>
@@ -190,7 +223,7 @@ const EngagementScopeTable = forwardRef((props, ref) => {
         <SaveButton
           onClick={handleSave}
           isLoading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !hasDataFilled}
         >
           Save Scope Details
         </SaveButton>

@@ -114,9 +114,10 @@ export const useEngagementScope = () => {
     setData(newData);
   }, []);
 
-  const saveData = useCallback(async () => {
+  const saveData = useCallback(async (dataToSave?: EngagementScope[]) => {
     try {
-      await engagementScopeMutation.mutateAsync({ data });
+      const dataToSend = dataToSave || data;
+      await engagementScopeMutation.mutateAsync({ data: dataToSend });
       return true;
     } catch (error) {
       console.error("Error saving engagement scope data:", error);

@@ -67,20 +67,39 @@ export default function AuditDetails() {
     []
   );
 
+  const handleTypeOfAuditReportChange = useCallback((value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      typeOfAuditReport: value,
+      // Clear description when changing report type
+      description: value === "Adhoc Report" ? prev.description : "",
+    }));
+  }, []);
+
   const isFormValid = useCallback(() => {
-    return (
+    const baseValidation = 
       formData.reportReleaseDate.trim() !== "" &&
       formData.typeOfAudit.trim() !== "" &&
       formData.typeOfAuditReport.trim() !== "" &&
       formData.period.fromDate.trim() !== "" &&
       formData.period.toDate.trim() !== "" &&
-      formData.pdf_url !== ""
-    );
+      formData.pdf_url !== "";
+    
+    // Additional validation for Adhoc Report
+    if (formData.typeOfAuditReport === "Adhoc Report") {
+      return baseValidation && formData.description.trim() !== "";
+    }
+    
+    return baseValidation;
   }, [formData]);
 
   const handleSave = useCallback(() => {
     if (!isFormValid()) {
-      alert("Please fill in all required fields and upload a PDF file");
+      if (formData.typeOfAuditReport === "Adhoc Report" && formData.description.trim() === "") {
+        alert("Please fill in Adhoc Description for Adhoc Report");
+      } else {
+        alert("Please fill in all required fields and upload a PDF file");
+      }
       return;
     }
 
@@ -88,7 +107,7 @@ export default function AuditDetails() {
       { ...formData },
       {
         onSuccess: (response: any) => {
-          toast.success("Audit Detils created successfully");
+          toast.success("Audit Details created successfully");
           if (response?.success) {
             setReportId(response.report_id);
           }
@@ -138,11 +157,7 @@ export default function AuditDetails() {
                 onChange={(e) =>
                   updateField("reportReleaseDate", e.target.value)
                 }
-                className={`border-0 bg-transparent ${
-                  formData.reportReleaseDate.trim() === ""
-                    ? "border-red-300 focus:border-red-500"
-                    : ""
-                }`}
+                className="border border-gray-300"
                 required
               />
             </TableCell>
@@ -156,11 +171,7 @@ export default function AuditDetails() {
                 value={formData.typeOfAudit}
                 onChange={(e) => updateField("typeOfAudit", e.target.value)}
                 placeholder="Enter audit type (e.g., Web Application Security Assessment)"
-                className={`border-0 bg-transparent ${
-                  formData.typeOfAudit.trim() === ""
-                    ? "border-red-300 focus:border-red-500"
-                    : ""
-                }`}
+                className="border border-gray-300"
                 required
               />
             </TableCell>
@@ -172,18 +183,10 @@ export default function AuditDetails() {
             <TableCell>
               <Select
                 value={formData.typeOfAuditReport}
-                onValueChange={(value) =>
-                  updateField("typeOfAuditReport", value)
-                }
+                onValueChange={handleTypeOfAuditReportChange}
                 required
               >
-                <SelectTrigger
-                  className={`border-0 bg-transparent ${
-                    formData.typeOfAuditReport.trim() === ""
-                      ? "border-red-300 focus:border-red-500"
-                      : ""
-                  }`}
-                >
+                <SelectTrigger className="border border-gray-300">
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,10 +202,32 @@ export default function AuditDetails() {
                   <SelectItem value="Compliance Report">
                     Compliance Report
                   </SelectItem>
+                  <SelectItem value="Adhoc Report">
+                    Adhoc Report
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </TableCell>
           </TableRow>
+          
+          {/* Adhoc Description Input - Only shown when Adhoc Report is selected */}
+          {formData.typeOfAuditReport === "Adhoc Report" && (
+            <TableRow>
+              <TableCell className="font-medium bg-gray-100">
+                Adhoc Description <span className="text-red-500">*</span>
+              </TableCell>
+              <TableCell>
+                <Input
+                  value={formData.description}
+                  onChange={(e) => updateField("description", e.target.value)}
+                  placeholder="Enter adhoc description"
+                  className="border border-gray-300"
+                  required
+                />
+              </TableCell>
+            </TableRow>
+          )}
+          
           <TableRow>
             <TableCell className="font-medium bg-gray-100">
               Period <span className="text-red-500">*</span>
@@ -215,11 +240,7 @@ export default function AuditDetails() {
                   onChange={(e) => {
                     updatePeriodField("fromDate", e.target.value);
                   }}
-                  className={`border-0 bg-transparent ${
-                    formData.period.fromDate.trim() === ""
-                      ? "border-red-300 focus:border-red-500"
-                      : ""
-                  }`}
+                  className="border border-gray-300"
                   placeholder="From Date"
                   required
                 />
@@ -231,11 +252,7 @@ export default function AuditDetails() {
                     updatePeriodField("toDate", e.target.value);
                   }}
                   min={formData.period.fromDate || undefined}
-                  className={`border-0 bg-transparent ${
-                    formData.period.toDate.trim() === ""
-                      ? "border-red-300 focus:border-red-500"
-                      : ""
-                  }`}
+                  className="border border-gray-300"
                   placeholder="To Date"
                   required
                 />
@@ -383,6 +400,11 @@ export default function AuditDetails() {
               ) : (
                 <span className="text-amber-600 dark:text-amber-400">
                   ⚠ Please complete all required fields marked with *
+                </span>
+              )}
+              {formData.typeOfAuditReport === "Adhoc Report" && formData.description.trim() === "" && (
+                <span className="block text-red-600 dark:text-red-400 text-sm mt-1">
+                  ⚠ Adhoc Description is required for Adhoc Report
                 </span>
               )}
             </p>

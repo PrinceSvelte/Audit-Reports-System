@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -169,7 +170,12 @@ export default function AuditDetails() {
             <TableCell>
               <Input
                 value={formData.typeOfAudit}
-                onChange={(e) => updateField("typeOfAudit", e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Prevent space as prefix - trim leading spaces
+                  const trimmedValue = value.trimStart();
+                  updateField("typeOfAudit", trimmedValue);
+                }}
                 placeholder="Enter audit type (e.g., Web Application Security Assessment)"
                 className="border border-gray-300"
                 required
@@ -217,11 +223,11 @@ export default function AuditDetails() {
                 Adhoc Description <span className="text-red-500">*</span>
               </TableCell>
               <TableCell>
-                <Input
+                <Textarea
                   value={formData.description}
                   onChange={(e) => updateField("description", e.target.value)}
                   placeholder="Enter adhoc description"
-                  className="border border-gray-300"
+                  className="border border-gray-300 min-h-[100px]"
                   required
                 />
               </TableCell>
